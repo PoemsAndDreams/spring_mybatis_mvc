@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--以下为spring格式校验链接，引入可以对xml格式校验-->
+
+<!--<beans xmlns="http://www.springframework.org/schema/beans"-->
+<!--       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--       xmlns:context="http://www.springframework.org/schema/context"-->
+<!--       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">-->
+
+<!--spring的xml格式校验链接结束-->
+
+<!--    获取扫描包路径，spring的xml需要加入context:,我们自己实现的spring就不需要加-->
+<!--    <context:component-scan base-package="com.yutian"></context:component-scan>-->
+<bean>
+    <component-scan base-package="com.yutian"></component-scan>
+</bean>
+<!--</beans>-->
