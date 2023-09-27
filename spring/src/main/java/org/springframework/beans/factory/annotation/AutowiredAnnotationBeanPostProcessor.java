@@ -29,7 +29,7 @@ public class AutowiredAnnotationBeanPostProcessor {
     }
 
     //@Autowired注入逻辑
-    public void postProcessProperties(){
+    public void postProcessProperties() {
         ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = xmlBeanDefinitionReader.getBeanDefinitionMap();
 
         for (String beanName : beanDefinitionMap.keySet()) {
@@ -44,20 +44,12 @@ public class AutowiredAnnotationBeanPostProcessor {
                     Class<?> aClass = declaredField.getType();
                     Object instance = null;
                     try {
-                        //如果是接口，使用其保存在beanDefinitionMap中的实现类
-                        if (aClass.isInterface()) {
-                            String name = declaredField.getName();
-                            //获取实现该接口的类
-                            BeanDefinition beanDefinitioninter = beanDefinitionMap.get(name);
-                            instance = beanDefinitioninter.getClazz().newInstance();
-                        }else {
-                            instance = aClass.newInstance();
-                        }
+                        String name = declaredField.getName();
+                        //获取实现该接口的类
+                        instance = InstanceMap.get(name);
                         Object o = InstanceMap.get(beanName);
                         declaredField.setAccessible(true);
-                        declaredField.set(o,instance);
-                    } catch (InstantiationException e) {
-                        throw new RuntimeException(e);
+                        declaredField.set(o, instance);
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
@@ -70,7 +62,6 @@ public class AutowiredAnnotationBeanPostProcessor {
     }
 
 
-
     public void createBeanInstance() {
         ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = xmlBeanDefinitionReader.getBeanDefinitionMap();
         for (String beanName : beanDefinitionMap.keySet()) {
@@ -80,7 +71,7 @@ public class AutowiredAnnotationBeanPostProcessor {
                 //实例化
                 Object instance = clazz.getDeclaredConstructor().newInstance();
                 //保存至InstanceMap，方便使用
-                InstanceMap.put(beanName,instance);
+                InstanceMap.put(beanName, instance);
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {

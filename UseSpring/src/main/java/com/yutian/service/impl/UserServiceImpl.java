@@ -1,6 +1,10 @@
 package com.yutian.service.impl;
 
+import com.yutian.Dao.BookDao;
+import com.yutian.Dao.Impl.UserDaoImpl;
+import com.yutian.Dao.UserDao;
 import com.yutian.service.UserService;
+import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Service;
 
 /**
@@ -10,8 +14,15 @@ import org.springframework.annotation.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Autowired
+    UserDao userDao;
+
+    @Autowired
+    BookDao bookDao;
+
     @Override
     public void test() {
-        System.out.println("Hello spring!");
+        userDao.test();
+        bookDao.add();
     }
 }

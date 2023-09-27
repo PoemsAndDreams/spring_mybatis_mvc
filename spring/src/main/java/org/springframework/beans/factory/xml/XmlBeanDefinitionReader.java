@@ -7,6 +7,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.annotation.Component;
 import org.springframework.annotation.Controller;
+import org.springframework.annotation.Repository;
 import org.springframework.annotation.Service;
 import org.springframework.beans.factory.config.BeanDefinition;
 
@@ -73,25 +74,28 @@ public class XmlBeanDefinitionReader {
                         //加载类
                         Class<?> clazz = classLoader.loadClass(className);
 
-                        //类是否有Component，Service,Controller注解
-                        if (clazz.isAnnotationPresent(Component.class) || clazz.isAnnotationPresent(Controller.class) || clazz.isAnnotationPresent(Service.class)){
+                        //类是否有Component，Service,Controller,Repository注解
+                        if (clazz.isAnnotationPresent(Component.class) || clazz.isAnnotationPresent(Controller.class) || clazz.isAnnotationPresent(Service.class) || clazz.isAnnotationPresent(Repository.class)){
 
                             Component componentAnnotation = clazz.getDeclaredAnnotation(Component.class);
                             Controller controllerAnnotation = clazz.getDeclaredAnnotation(Controller.class);
                             Service serviceAnnotation = clazz.getDeclaredAnnotation(Service.class);
+                            Repository repositoryAnnotation = clazz.getDeclaredAnnotation(Repository.class);
 
                             String value = "";
                             //Bean定义类
                             BeanDefinition beanDefinition = new BeanDefinition();
                             //判断注解是否有value值
-                            if (componentAnnotation != null || controllerAnnotation != null || serviceAnnotation != null){
+                            if (componentAnnotation != null || controllerAnnotation != null || serviceAnnotation != null || repositoryAnnotation != null){
                                 if (componentAnnotation != null && !componentAnnotation.value() .equals("")){
                                     value = componentAnnotation.value();
                                 }else if (controllerAnnotation != null && !controllerAnnotation.value().equals("")){
                                     value = controllerAnnotation.value();
                                 }else if (serviceAnnotation != null && !serviceAnnotation.value().equals("")){
                                     value = serviceAnnotation.value();
-                                }else {
+                                } else if (repositoryAnnotation != null && !repositoryAnnotation.value().equals("")) {
+                                    value = repositoryAnnotation.value();
+                                } else {
                                     String name = clazz.getSimpleName();
                                     //默认以开头小写的类名作为实例名
                                     value = name.valueOf(name.charAt(0)).toLowerCase() + name.substring(1);
