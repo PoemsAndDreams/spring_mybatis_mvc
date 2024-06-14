@@ -12,6 +12,6 @@
 <!--    获取扫描包路径，spring的xml需要加入context:,我们自己实现的spring就不需要加-->
 <!--    <context:component-scan base-package="com.yutian"></context:component-scan>-->
 <bean>
-    <component-scan base-package="com.yutian"></component-scan>
+    <component-scan base-package="com.dreams"></component-scan>
 </bean>
 <!--</beans>-->

@@ -1,5 +1,5 @@
-import com.yutian.controller.UserController;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.dreams.controller.UserController;
+import com.dreams.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author PoemsAndDreams
@@ -9,6 +9,7 @@ public class Test {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
         //......
+
         UserController userController = (UserController) context.getBean("uc");
 
         userController.test();
