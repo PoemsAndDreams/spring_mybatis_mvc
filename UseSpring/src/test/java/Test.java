@@ -1,5 +1,5 @@
 import com.dreams.controller.UserController;
-import com.dreams.springframework.context.support.ClassPathXmlApplicationContext;
+import com.dreams.springframework.context.ClassPathXmlApplicationContext;
 
 /**
  * @author PoemsAndDreams

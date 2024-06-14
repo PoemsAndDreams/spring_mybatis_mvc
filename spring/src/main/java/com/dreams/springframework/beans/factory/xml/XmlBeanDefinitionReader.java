@@ -1,5 +1,6 @@
 package com.dreams.springframework.beans.factory.xml;
 
+import com.dreams.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.dreams.springframework.stereotype.Component;
 import com.dreams.springframework.stereotype.Repository;
 import com.dreams.springframework.stereotype.Service;
@@ -20,29 +21,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author PoemsAndDreams
  * @date 2023-09-25 10:15
+ * @description xml解析类
  */
 public class XmlBeanDefinitionReader {
 
 
-    //存储bean定义信息，所以扫描到的
-    private ConcurrentHashMap<String,BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
-
-
-    public ConcurrentHashMap<String, BeanDefinition> getBeanDefinitionMap() {
-        return beanDefinitionMap;
-    }
-
     //加载xml配置文件
-    public void loadBeanDefinitions(String configResources){
-
+    public void loadBeanDefinitions(ConfigurableListableBeanFactory beanFactory, String configResources){
         //获取扫描包
         String scanPackage = getComponentScanPackage(configResources);
         //获取扫描包路径
-        findScanPackagePath(scanPackage);
-
+        findScanPackagePath(beanFactory,scanPackage);
     }
 
-    private void findScanPackagePath(String scanPackage) {
+    private void findScanPackagePath(ConfigurableListableBeanFactory beanFactory, String scanPackage) {
         ClassLoader classLoader = XmlBeanDefinitionReader.class.getClassLoader();
         scanPackage = scanPackage.replace(".","/");
         URL url = classLoader.getResource(scanPackage);
@@ -53,12 +45,13 @@ public class XmlBeanDefinitionReader {
         }
         File file = new File(urlFile);
         //加载并实例化
-        loadAllClass(file);
+        loadAllClass(beanFactory,file);
 
     }
 
     //加载
-    private void loadAllClass(File path) {
+    private void loadAllClass(ConfigurableListableBeanFactory beanFactory, File path) {
+        ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = beanFactory.getBeanDefinitionMap();
         File[] files = path.listFiles();
         for (File file : files) {
             //如果是个目录
@@ -129,7 +122,7 @@ public class XmlBeanDefinitionReader {
                 }
             }
             else {
-                loadAllClass(file);
+                loadAllClass(beanFactory, file);
             }
         }
     }
