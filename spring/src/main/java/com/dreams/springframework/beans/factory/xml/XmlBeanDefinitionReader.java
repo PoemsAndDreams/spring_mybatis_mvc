@@ -1,5 +1,7 @@
 package com.dreams.springframework.beans.factory.xml;
 
+import com.dreams.springframework.aspectj.annotation.Aspect;
+import com.dreams.springframework.aspectj.annotation.Pointcut;
 import com.dreams.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.dreams.springframework.stereotype.Component;
 import com.dreams.springframework.stereotype.Repository;
@@ -15,6 +17,7 @@ import com.dreams.springframework.beans.factory.config.BeanDefinition;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,6 +55,7 @@ public class XmlBeanDefinitionReader {
     //加载
     private void loadAllClass(ConfigurableListableBeanFactory beanFactory, File path) {
         ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = beanFactory.getBeanDefinitionMap();
+        ConcurrentHashMap<String, Class<?>> advisorsCacheMap = beanFactory.getAdvisorsCacheMap();
         File[] files = path.listFiles();
         for (File file : files) {
             //如果是个目录
@@ -66,6 +70,22 @@ public class XmlBeanDefinitionReader {
                     try {
                         //加载类
                         Class<?> clazz = classLoader.loadClass(className);
+
+                        //判断是否是切面类
+                        if (clazz.isAnnotationPresent(Aspect.class) && clazz.isAnnotationPresent(Component.class)){
+                            //获取 @Pointcut 注解的值，并使用它作为键，将类存储在 advisorsCacheMap 中。
+                            for (Method method : clazz.getDeclaredMethods()) {
+                                if (method.isAnnotationPresent(Pointcut.class)) {
+                                    Pointcut pointcut = method.getAnnotation(Pointcut.class);
+                                    String pointcutExpression = pointcut.value();
+
+                                    if (!advisorsCacheMap.containsKey(pointcutExpression)) {
+                                        advisorsCacheMap.put(pointcutExpression, clazz);
+                                    }
+                                }
+                            }
+                            continue;
+                        }
 
                         //类是否有Component，Service,Controller,Repository注解
                         if (clazz.isAnnotationPresent(Component.class) || clazz.isAnnotationPresent(Controller.class) || clazz.isAnnotationPresent(Service.class) || clazz.isAnnotationPresent(Repository.class)){
@@ -98,6 +118,7 @@ public class XmlBeanDefinitionReader {
                                 if (beanDefinitionMap.get(value) != null) {
                                     throw new RuntimeException("spring IOC Container is already exists " + beanDefinitionMap.get(value));
                                 }
+
                                 beanDefinition.setClazz(clazz);
                                 beanDefinition.setBeanName(value);
                                 //保存到bean定义

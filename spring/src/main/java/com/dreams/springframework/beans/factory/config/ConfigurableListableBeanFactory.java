@@ -7,11 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author PoemsAndDreams
  * @date 2024-06-14 17:34
- * @description //TODO
+ * @description
  */
 public interface ConfigurableListableBeanFactory {
 
     ConcurrentHashMap<String, Object> getInstanceMap();
+
+    ConcurrentHashMap<String, Class<?>> getAdvisorsCacheMap();
 
     ConcurrentHashMap<String, BeanDefinition> getBeanDefinitionMap();
 

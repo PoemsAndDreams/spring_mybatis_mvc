@@ -7,7 +7,7 @@ import com.dreams.session.SqlSessionFactory;
 /**
  * @author PoemsAndDreams
  * @date 2024-06-09 02:02
- * @description //TODO
+ * @description
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
     private Configuration configuration;

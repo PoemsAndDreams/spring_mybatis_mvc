@@ -11,6 +11,6 @@ import com.dreams.springframework.stereotype.Repository;
 public class UserDaoImpl implements UserDao {
     @Override
     public void test() {
-        System.out.println("Hello spring");
+        System.out.println("Hello spring - userDao");
     }
 }

@@ -3,6 +3,16 @@ package com.dreams.springframework.context;
 import com.dreams.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.dreams.springframework.beans.factory.config.DefaultListableBeanFactory;
 import com.dreams.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -26,10 +36,11 @@ public class ClassPathXmlApplicationContext {
         // obtainFreshBeanFactory 加载spring入口
         obtainFreshBeanFactory();
 
+
         //实例化Bean
         beanFactory.createBeanInstance();
-    }
 
+    }
 
     private void obtainFreshBeanFactory() {
 

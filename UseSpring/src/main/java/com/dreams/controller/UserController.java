@@ -8,7 +8,7 @@ import com.dreams.springframework.stereotype.Controller;
  * @author PoemsAndDreams
  * @date 2023-09-27 07:49
  */
-@Controller(value = "uc")
+@Controller
 public class UserController {
     @Autowired
     UserServiceImpl userService;

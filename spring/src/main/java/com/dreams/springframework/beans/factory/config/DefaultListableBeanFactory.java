@@ -1,15 +1,23 @@
 package com.dreams.springframework.beans.factory.config;
 
+import com.dreams.springframework.aspectj.annotation.After;
+import com.dreams.springframework.aspectj.annotation.Before;
+import com.dreams.springframework.context.ClassPathXmlApplicationContext;
 import com.dreams.springframework.stereotype.Autowired;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author PoemsAndDreams
  * @date 2024-06-14 17:35
- * @description //TODO
+ * @description
  */
 public class DefaultListableBeanFactory implements ConfigurableListableBeanFactory {
 
@@ -18,6 +26,15 @@ public class DefaultListableBeanFactory implements ConfigurableListableBeanFacto
 
     //实例化存储
     ConcurrentHashMap<String, Object> InstanceMap = new ConcurrentHashMap<>();
+
+    // 存储切面数据
+    ConcurrentHashMap<String, Class<?>> advisorsCacheMap = new ConcurrentHashMap<>();
+
+
+    @Override
+    public ConcurrentHashMap<String, Class<?>> getAdvisorsCacheMap() {
+        return advisorsCacheMap;
+    }
 
     @Override
     public ConcurrentHashMap<String, BeanDefinition> getBeanDefinitionMap() {
@@ -49,9 +66,81 @@ public class DefaultListableBeanFactory implements ConfigurableListableBeanFacto
                 throw new RuntimeException(e);
             }
         }
+
+        this.resolveInstantiationAspect();
+
         //自动注入逻辑
         this.postProcessProperties();
     }
+
+
+
+    //处理切面
+    private void resolveInstantiationAspect() {
+
+        for (Map.Entry<String, Class<?>> entry : advisorsCacheMap.entrySet()) {
+            String packagePattern = entry.getKey();
+            Class<?> aspectClass = entry.getValue();
+
+            for (Map.Entry<String, Object> beanEntry : InstanceMap.entrySet()) {
+                Object bean = beanEntry.getValue();
+                String beanName = beanEntry.getKey();
+
+                if (bean.getClass().getPackage().getName().matches(packagePattern.replace("*", ".*"))) {
+                    System.out.println("Applying aspect to bean: " + beanName);
+                    // 创建 Enhancer 对象，用于生成代理类
+                    Enhancer enhancer = new Enhancer();
+                    // 设置目标类的父类，即被代理的类
+                    enhancer.setSuperclass(bean.getClass());
+                    // 设置回调，即拦截器
+                    enhancer.setCallback(new CustomInterceptor(bean, aspectClass));
+                    // 生成代理对象
+                    Object proxy = enhancer.create();
+                    InstanceMap.put(beanName, proxy);
+                }
+            }
+        }
+    }
+
+    // MethodInterceptor 实现类，用于处理方法调用
+    class CustomInterceptor implements MethodInterceptor {
+        private final Object target;
+        private final  Class<?> aspectClass;
+
+        public CustomInterceptor(Object target,  Class<?> aspectClass) {
+            this.target = target;
+            this.aspectClass = aspectClass;
+        }
+
+        @Override
+        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+            Method beforeMethod = null;
+            Method afterMethod = null;
+            Method[] methods = aspectClass.getMethods();
+
+            for (Method m : methods) {
+                if (m.isAnnotationPresent(Before.class)) {
+                    beforeMethod = m;
+                } else if (m.isAnnotationPresent(After.class)) {
+                    afterMethod = m;
+                }
+            }
+
+            Object aspectInstance = null;
+            try {
+                aspectInstance = aspectClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            beforeMethod.invoke(aspectInstance);
+            // 调用目标对象的方法
+            Object result = proxy.invokeSuper(obj, args);
+            afterMethod.invoke(aspectInstance);
+            return result;
+        }
+    }
+
 
 
     @Override

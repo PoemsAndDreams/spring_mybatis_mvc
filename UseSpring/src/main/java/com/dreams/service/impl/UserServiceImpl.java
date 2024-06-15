@@ -1,7 +1,7 @@
 package com.dreams.service.impl;
 
-import com.dreams.Dao.BookDao;
-import com.dreams.Dao.UserDao;
+
+import com.dreams.Dao.Impl.UserDaoImpl;
 import com.dreams.service.UserService;
 import com.dreams.springframework.stereotype.Autowired;
 import com.dreams.springframework.stereotype.Service;
@@ -14,14 +14,12 @@ import com.dreams.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserDao userDao;
+    UserDaoImpl userDao;
 
-    @Autowired
-    BookDao bookDao;
 
     @Override
     public void test() {
+        System.out.println("-----UserServiceImpl------");
         userDao.test();
-        bookDao.add();
     }
 }
