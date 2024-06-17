@@ -1,0 +1,41 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+
+  <!--设置Spring配置文件自定义的位置和名称-->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring.xml</param-value>
+  </context-param>
+
+  <!--配置Spring的监听器，在服务器启动时加载Spring的配置文件-->
+  <listener>
+    <listener-class>com.dreams.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+  <!--配置SpringMVC的前端控制器DispatcherServlet-->
+  <servlet>
+    <servlet-name>springMVC</servlet-name>
+    <servlet-class>com.dreams.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!--设置SpringMVC配置文件自定义的位置和名称-->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:springmvc.xml</param-value>
+    </init-param>
+    <!--编码-->
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <!--将DispatcherServlet的初始化时间提前到服务器启动时-->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springMVC</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+</web-app>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<bean>
+    <!-- 配置静态资源处理器 -->
+    <default-servlet-handler/>
+</bean>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bean>
+    <component-scan base-package="com.dreams"></component-scan>
+</bean>

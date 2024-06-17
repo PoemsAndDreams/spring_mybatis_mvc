@@ -25,6 +25,10 @@ public class ClassPathXmlApplicationContext {
 
     private String configResources;
 
+    public ConfigurableListableBeanFactory getBeanFactory() {
+        return beanFactory;
+    }
+
     public ClassPathXmlApplicationContext(String configResources) {
         this.configResources = configResources;
         //初始化spring容器
