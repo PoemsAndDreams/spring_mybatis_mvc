@@ -2,6 +2,8 @@ package com.dreams.service.impl;
 
 
 import com.dreams.Dao.Impl.UserDaoImpl;
+import com.dreams.mappers.UserMapper;
+import com.dreams.pojo.User;
 import com.dreams.service.UserService;
 import com.dreams.springframework.stereotype.Autowired;
 import com.dreams.springframework.stereotype.Service;
@@ -13,13 +15,14 @@ import com.dreams.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserDaoImpl userDao;
-
+//    @Autowired
+//    UserMapper userMapper;
 
     @Override
-    public void test() {
-        System.out.println("-----UserServiceImpl------");
-        userDao.test();
+    public User getOneUser(Integer id) {
+        User user = new User();
+        user.setUsername("Dreams");
+        user.setPassword("123456");
+        return user;
     }
 }

@@ -2,6 +2,7 @@ package com.dreams.springframework.web.processor;
 
 import com.dreams.springframework.web.servlet.HandlerAdapter;
 import com.dreams.springframework.web.servlet.HandlerMapping;
+import org.thymeleaf.TemplateEngine;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,13 @@ import java.util.Map;
  * @description //路径处理器
  */
 public class RouteProcessor implements Processor {
+
+    private TemplateEngine templateEngine;
     private Processor nextProcessor;
+
+    public RouteProcessor(TemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
+    }
 
     @Override
     public void setNextProcessor(Processor processor) {
@@ -47,7 +54,7 @@ public class RouteProcessor implements Processor {
             }
 
             // 处理请求--处理器适配器
-            HandlerAdapter handlerAdapter = new HandlerAdapter(pathMethodMap.get(requestURI), request, response);
+            HandlerAdapter handlerAdapter = new HandlerAdapter(templateEngine,pathMethodMap.get(requestURI), request, response);
 
             //执行
             handlerAdapter.execute();

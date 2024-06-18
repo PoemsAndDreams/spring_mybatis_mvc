@@ -17,15 +17,16 @@ public class UserController {
     UserServiceImpl userService;
 
 
-    @RequestMapping("/list")
-    public void test(User user){
-        userService.test();
+    @RequestMapping("/one")
+    public User test(@RequestParam("id") Integer id){
+        User user = userService.getOneUser(id);
+        return user;
     }
 
     @RequestMapping("/add")
-    public void insert(@RequestParam("name") String userName, @RequestParam("id") Integer id){
+    public String insert(@RequestParam("name") String userName, @RequestParam("id") Integer id){
         System.out.println("username : " + userName);
         System.out.println("id :" + id);
-        userService.test();
+        return "list";
     }
 }

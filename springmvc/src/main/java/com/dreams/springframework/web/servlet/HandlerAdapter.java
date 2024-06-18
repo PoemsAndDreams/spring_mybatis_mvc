@@ -1,11 +1,14 @@
 package com.dreams.springframework.web.servlet;
 
 import com.dreams.springframework.web.bind.annotation.RequestParam;
+import com.google.gson.Gson;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.text.ParseException;
@@ -18,19 +21,28 @@ import java.util.Date;
  * @description //封装请求参数，调用目标方法
  */
 public class HandlerAdapter {
+
+    private TemplateEngine templateEngine;
     private HandlerMapping handlerMapping;
 
     private HttpServletRequest request;
 
     private HttpServletResponse response;
 
-    public HandlerAdapter(HandlerMapping handlerMapping, HttpServletRequest request, HttpServletResponse response) {
+
+    public HandlerAdapter(TemplateEngine templateEngine, HandlerMapping handlerMapping, HttpServletRequest request, HttpServletResponse response) {
+        this.templateEngine = templateEngine;
         this.handlerMapping = handlerMapping;
         this.request = request;
         this.response = response;
     }
 
     public void execute() {
+
+        // 创建 WebContext,用于Thymeleaf
+        ServletContext servletContext = request.getServletContext();
+        WebContext webContext = new WebContext(request, response, servletContext, request.getLocale());
+
         //控制器对象
         Object object = handlerMapping.getObject();
         //控制器方法
@@ -63,25 +75,43 @@ public class HandlerAdapter {
                 String requestParameter = request.getParameter(name);
                 // 简单转换字符串参数为对应类型
                 Object parameterObj = convert(requestParameter, type);
+                webContext.setVariable(name, parameterObj);
                 parameterValues.add(parameterObj);
             }
         }
 
         try {
-
             method.setAccessible(true);
             Object[] array = parameterValues.toArray(new Object[0]);
             // 反射调用控制器方法
             System.out.println(method);
             Object result = method.invoke(object, parameterValues.toArray(new Object[0]));
-            // 处理方法返回值
-            // todo 处理方法返回值
+
+
+            // 返回Thymeleaf视图
+            if (result != null && result instanceof String) {
+                String viewName = (String) result;
+                // 处理视图名称，确保视图名称符合 Thymeleaf 的期望格式
+                viewName = viewName.startsWith("/") ? viewName.substring(1) : viewName; // 去掉开头的斜杠
+                // 转发到 Thymeleaf 模板页面
+                viewName = viewName.startsWith("/") ? viewName.replace("/", "") : viewName;
+                // 渲染 Thymeleaf 模板
+                response.setContentType("text/html;charset=UTF-8");
+                templateEngine.process(viewName, webContext, response.getWriter());
+                return;
+            }
+
+            // 返回json
+            if (result instanceof Object){
+                Gson gson=new Gson();
+                String json = gson.toJson(result);
+                response.setContentType("application/json;charset=utf-8");
+                response.getWriter().write(json);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
 
     }
 
@@ -113,7 +143,6 @@ public class HandlerAdapter {
         } else {
             // 支持自定义类
             // todo 支持 自定义类型
-
             throw new UnsupportedOperationException("Unsupported parameter type: " + targetType);
         }
     }

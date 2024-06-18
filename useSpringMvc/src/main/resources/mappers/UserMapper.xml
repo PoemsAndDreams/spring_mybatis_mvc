@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="com.dreams.mappers.UserMapper">
+
+    <select id="list" resultType="com.dreams.pojo.User">
+        select * from user
+    </select>
+
+    <select id="select" resultType="com.dreams.pojo.User">
+        select * from user where username= #{username}
+    </select>
+
+    <select id="getOneUser" resultType="java.lang.Integer">
+        select * from user where id = #{id}
+    </select>
+
+    <!--int insertUser();-->
+    <insert id="insertUser" parameterType="com.dreams.pojo.User">
+        insert into user(id, username, password) values(#{id},#{username},#{password})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integet">
+        delete from user where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.dreams.pojo.User">
+        update user set password = #{password} where id = #{id}
+    </update>
+
+
+</mapper>

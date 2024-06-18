@@ -3,6 +3,8 @@ package com.dreams.springframework.web.servlet;
 import com.dreams.springframework.web.processor.EncodeProcessor;
 import com.dreams.springframework.web.processor.RouteProcessor;
 import com.dreams.springframework.web.processor.StaticResourceProcessor;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
@@ -15,6 +17,7 @@ import java.io.IOException;
  * @description //前端控制器
  */
 public class DispatcherServlet extends HttpServlet {
+    private TemplateEngine templateEngine;
 
     private String contextConfigLocation;
 
@@ -36,6 +39,16 @@ public class DispatcherServlet extends HttpServlet {
             contextConfigLocation = contextConfigLocation.replace("classpath:","")   ;
         }
 
+        ServletContext context = this.getServletConfig().getServletContext();
+        // 配置 Thymeleaf 模板解析器
+        ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(context);
+        templateResolver.setPrefix("/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML5");
+
+        // 创建 Thymeleaf 模板引擎
+        templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
     }
 
     @Override
@@ -44,7 +57,7 @@ public class DispatcherServlet extends HttpServlet {
         EncodeProcessor encodeProcessor = new EncodeProcessor(this.encoding);
         StaticResourceProcessor staticResourceProcessor = new StaticResourceProcessor(this.contextConfigLocation);
 
-        RouteProcessor routeProcessor = new RouteProcessor();
+        RouteProcessor routeProcessor = new RouteProcessor(templateEngine);
         encodeProcessor.setNextProcessor(staticResourceProcessor);
         // 加入路径处理器
         staticResourceProcessor.setNextProcessor(routeProcessor);
